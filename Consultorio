@@ -1,0 +1,144 @@
+class Cliente:
+    def __init__(self, cedula, nombre, telefono, direccion, tipo_cliente, tipo_atencion, cantidad):
+        self.cedula = int(cedula)
+        self.nombre = nombre
+        self.telefono = telefono
+        self.direccion = direccion
+        self.tipo_cliente = tipo_cliente
+        self.tipo_atencion = tipo_atencion
+        self.cantidad = cantidad
+        self.valor_cita = self.obtener_valor_cita()
+        self.valor_atencion = self.obtener_valor_atencion()
+        self.valor_total = self.calcular_valor_total()
+
+    def obtener_valor_cita(self):
+        valores = {
+            "Particular": 80000,
+            "Eps": 5000,
+            "Medicina Prepagada": 30000
+        }
+        return valores.get(self.tipo_cliente, 0)
+
+    def obtener_valor_atencion(self):
+        tabla = {
+            "Particular": {"Limpieza": 60000, "Calzas": 80000, "Extracción": 100000, "Diagnóstico": 50000},
+            "Eps": {"Limpieza": 0, "Calzas": 40000, "Extracción": 40000, "Diagnóstico": 0},
+            "Medicina Prepagada": {"Limpieza": 0, "Calzas": 10000, "Extracción": 10000, "Diagnóstico": 0}
+        }
+        return tabla.get(self.tipo_cliente, {}).get(self.tipo_atencion, 0)
+
+    def calcular_valor_total(self):
+        cantidad = 1 if self.tipo_atencion in ["Limpieza", "Diagnóstico"] else self.cantidad
+        return self.valor_cita + (self.valor_atencion * cantidad)
+
+    def __str__(self):
+        return f"{self.cedula} - {self.nombre} - Total: ${self.valor_total}"
+
+
+def leer_entero(mensaje):
+    while True:
+        try:
+            valor = int(input(mensaje))
+            if valor > 0:
+                return valor
+            print("Por favor, ingrese un número entero positivo.")
+        except ValueError:
+            print("Entrada no válida. Por favor, ingrese un número entero.")
+
+
+def ordenar_clientes(clientes):
+    n = len(clientes)
+    for i in range(n):
+        for j in range(0, n - i - 1):
+            if clientes[j].valor_total < clientes[j + 1].valor_total:
+                clientes[j], clientes[j + 1] = clientes[j + 1], clientes[j]
+
+
+def busqueda_binaria(clientes, cedula):
+    try:
+        cedula = int(cedula)
+    except ValueError:
+        return None
+
+    clientes.sort(key=lambda x: x.cedula)
+    izq = 0
+    der = len(clientes) - 1
+
+    while izq <= der:
+        mid = (izq + der) // 2
+        if clientes[mid].cedula == cedula:
+            return clientes[mid]
+        elif clientes[mid].cedula < cedula:
+            izq = mid + 1
+        else:
+            der = mid - 1
+
+    return None
+
+
+def estadisticas(clientes):
+    total_clientes = len(clientes)
+    ingresos = sum(c.valor_total for c in clientes)
+    extracciones = sum(1 for c in clientes if c.tipo_atencion == "Extracción")
+    promedio = ingresos / total_clientes if total_clientes > 0 else 0
+
+    print("\nEstadísticas")
+    print("Total de Clientes Atendidos:", total_clientes)
+    print("Ingresos Totales:", ingresos)
+    print("Promedio por Cliente:", promedio)
+    print("Cantidad de Extracciones realizadas:", extracciones)
+
+
+def menu():
+    clientes = []
+
+    while True:
+        print("\nMenú Principal")
+        print("1. Agregar Cliente")
+        print("2. Mostrar Clientes")
+        print("3. Buscar Cliente por Cédula")
+        print("4. Estadísticas")
+        print("5. Salir")
+
+        opcion = input("Seleccione una opción: ").strip()
+
+        if opcion == "1":
+            cedula = input("Ingrese la cédula del cliente: ")
+            nombre = input("Ingrese el nombre del cliente: ")
+            telefono = input("Ingrese el teléfono del cliente: ")
+            direccion = input("Ingrese la dirección del cliente: ")
+            tipo_cliente = input("Ingrese el tipo de cliente (Particular, Eps, Medicina Prepagada): ")
+            tipo_atencion = input("Ingrese el tipo de atención (Limpieza, Calzas, Extracción, Diagnóstico): ")
+            cantidad = leer_entero("Ingrese la cantidad de atenciones (si aplica): ")
+
+            cliente = Cliente(cedula, nombre, telefono, direccion, tipo_cliente, tipo_atencion, cantidad)
+            clientes.append(cliente)
+            print("Cliente agregado exitosamente.")
+
+        elif opcion == "2":
+            ordenar_clientes(clientes)
+            for cliente in clientes:
+                print(cliente)
+
+        elif opcion == "3":
+            cedula_buscar = input("Ingrese la cédula del cliente a buscar: ")
+            resultado = busqueda_binaria(clientes, cedula_buscar)
+            if resultado:
+                print(resultado)
+            else:
+                print("Cliente no encontrado.")
+
+        elif opcion == "4":
+            estadisticas(clientes)
+
+        elif opcion == "5":
+            print("Saliendo del programa.")
+            break
+
+        else:
+            print("Opción no válida. Por favor, seleccione una opción del menú.")
+
+
+if __name__ == "__main__":
+    menu()
+
