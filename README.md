@@ -12,4 +12,4 @@ Por otra parte, se debe implementar un proceso de ordenamiento que permita organ
 
 Integrando el uso de estructuras básicas de programación, manejo de datos, cálculos aritméticos, almacenamiento en memoria, ordenamiento y búsqueda, con el fin de simular un sistema sencillo de gestión para un consultorio odontológico.
 
-Camila Andrea Oquendo Quintero
+> Camila Andrea Oquendo Quintero
